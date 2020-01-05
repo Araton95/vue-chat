@@ -5,12 +5,12 @@
       <v-btn icon @click="exit">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
-      <v-toolbar-title>Toolbar</v-toolbar-title>
+      <v-toolbar-title>Room {{ user.room }}</v-toolbar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-model="drawer" mobile-break-point="640" app>
       <v-list subheader>
-        <v-subheader>Room users</v-subheader>
+        <v-subheader>Users</v-subheader>
 
         <v-list-item v-for="user in users" :key="user.id" @click.prevent>
           <v-list-item-content>
@@ -27,7 +27,7 @@
     </v-navigation-drawer>
 
     <v-content>
-      <div>
+      <div style="height: 100%">
         <nuxt />
       </div>
     </v-content>
@@ -50,6 +50,7 @@ export default {
       }
     ]
   }),
+  computed: mapState(["user"]),
   methods: {
     ...mapMutations(["clearData"]),
     exit() {
