@@ -1,11 +1,82 @@
 <template>
   <v-layout column justify-center align-center>
-    <v-flex xs12 sm8 md6></v-flex>
+    <v-flex xs12 sm8>
+      <v-card min-width="400px">
+        <v-card-title>
+          <h1>Chat title</h1>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-text-field
+              v-model="name"
+              :counter="16"
+              :rules="nameRules"
+              label="Name"
+              required
+            ></v-text-field>
+
+            <v-text-field
+              v-model="room"
+              :rules="roomRules"
+              label="Write room"
+              required
+            ></v-text-field>
+
+            <v-btn
+              :disabled="!valid"
+              color="primary"
+              class="mr-4"
+              @click="submit"
+            >
+              Enter
+            </v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-flex>
   </v-layout>
 </template>
 
 <script>
+import { mapMutations } from "vuex";
 export default {
-  components: {}
-}
+  layout: "empty",
+  head: {
+    title: "Welcome to Nuxt chat"
+  },
+  sockets: {
+    connect() {
+      console.log("socket connected");
+    }
+  },
+  data: () => ({
+    valid: true,
+    name: "",
+    nameRules: [
+      v => !!v || "Name is required",
+      v => (v && v.length <= 16) || "Name must be less than 16 characters"
+    ],
+    room: "",
+    roomRules: [v => !!v || "Room is required"]
+  }),
+  methods: {
+    ...mapMutations(["setUser"]),
+    submit() {
+      if (this.$refs.form.validate()) {
+        const user = {
+          name: this.name,
+          room: this.room
+        };
+        this.setUser(user);
+        this.$router.push("/chat");
+      }
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    }
+  }
+};
 </script>
