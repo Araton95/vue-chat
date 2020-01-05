@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="name === 'admin'" class="system">
-      <p class="text-xs-center">{{ text }}</p>
+      <p class="text-center">{{ text }}</p>
       <hr />
     </div>
-    <div v-else>
+    <div class="wrap" v-else>
       <div class="message" :class="{ owner }">
         <small>
           <strong>
@@ -47,9 +47,10 @@ export default {
 }
 
 .message {
+  width: 60%;
   padding: 1rem;
-  margin: 1rem;
-  box-shadow: 0 1px 0 0 black;
+  margin: 0 1rem 1rem;
+  box-shadow: 0 1px 0 0 rgba(50, 50, 50, 0.3);
   border-radius: 4px;
   background: #1976d2;
 

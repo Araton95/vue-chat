@@ -1,26 +1,36 @@
 <template>
   <div class="c-wrap">
-    <div class="c-chat">
+    <div class="c-chat" ref="block">
       <Message
         v-for="message in messages"
-        :key="message.text"
+        :key="message.id"
         :name="message.name"
         :text="message.text"
-        :owner="true"
+        :owner="message.id === user.id ? true : false"
       />
     </div>
-    <div class="c-form"></div>
+    <div class="c-form">
+      <ChatForm />
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import Message from "@/components/Message";
+import ChatForm from "@/components/ChatForm";
 
 export default {
   middleware: ["chat"],
   computed: mapState(["user", "messages"]),
-  components: { Message },
+  components: { Message, ChatForm },
+  watch: {
+    messages() {
+      setTimeout(() => {
+        this.$refs.block.scrollTop = this.$refs.block.scrollHeight;
+      });
+    }
+  },
   head() {
     return {
       title: `Room #${this.user.room}`

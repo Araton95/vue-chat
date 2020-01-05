@@ -1,7 +1,7 @@
 <template>
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8>
-      <v-card min-width="400px">
+      <v-card class="mt-12" min-width="400px">
         <v-card-title>
           <h1>Chat title</h1>
         </v-card-title>
@@ -32,6 +32,12 @@
             </v-btn>
           </v-form>
         </v-card-text>
+        <v-snackbar v-model="snackbar" :timeout="1500" top>
+          {{ message }}
+          <v-btn color="blue" text @click="snackbar = false">
+            Close
+          </v-btn>
+        </v-snackbar>
       </v-card>
     </v-flex>
   </v-layout>
@@ -44,14 +50,11 @@ export default {
   head: {
     title: "Welcome to Nuxt chat"
   },
-  sockets: {
-    connect() {
-      console.log("socket connected");
-    }
-  },
   data: () => ({
     valid: true,
     name: "",
+    message: "",
+    snackbar: false,
     nameRules: [
       v => !!v || "Name is required",
       v => (v && v.length <= 16) || "Name must be less than 16 characters"
@@ -59,6 +62,17 @@ export default {
     room: "",
     roomRules: [v => !!v || "Room is required"]
   }),
+  mounted() {
+    const { message } = this.$route.query;
+    if (message === "noUser") {
+      this.message = "Fill your values.";
+    } else if (message === "leftChat") {
+      this.message = "You left the chat.";
+    }
+
+    this.$router.replace({ message: null });
+    this.snackbar = !!this.message;
+  },
   methods: {
     ...mapMutations(["setUser"]),
     submit() {
@@ -67,8 +81,16 @@ export default {
           name: this.name,
           room: this.room
         };
-        this.setUser(user);
-        this.$router.push("/chat");
+
+        this.$socket.emit("userJoined", user, data => {
+          if (typeof data === "string") {
+            console.error(data);
+          } else {
+            user.id = data.userId;
+            this.setUser(user);
+            this.$router.push("/chat");
+          }
+        });
       }
     },
     reset() {
